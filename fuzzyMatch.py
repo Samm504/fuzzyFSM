@@ -61,7 +61,7 @@ def fuzzyFSM(pattern, string, threshold):
         print('Transitioned to Next State Successful')
 
         ## Debug Print Line
-        print('Automaton New State: ' + automaton.state)
+        ## print('Automaton New State: ' + automaton.state)
 
     ## Calculate Membership Grade of Automaton 
     automaton.membership_grade()
@@ -69,6 +69,8 @@ def fuzzyFSM(pattern, string, threshold):
 
     ## Debug Print Line
     print('Results:')
+    print('Final Position: ' + str(automaton.final_position))
+    print('Position: ' + str(automaton.position))
     print('Final State: ' + str(automaton.isFinalState()))
     print('Grade: ' + str(automaton.grade))
     
