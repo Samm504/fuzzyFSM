@@ -1,108 +1,114 @@
+## Fuzzy FSM implemented using NFA
 import docx2txt
-import math
-
-## Time Complexity: O(nm)
-## n = length of text1, map = length of text2
-## Compare_Documents function has a for loop that iterates over n and the fuzzy_string_match function has a for loop that iterates over m.
+import re
 
 class Automaton:
-    def __init__(self, pattern):
+    def __init__(self, pattern, threshold):
+        ## Initialize NFA
         self.pattern = pattern
         self.m = len(pattern)
-        self.state = 0
-        self.grades = [0] * self.m
 
-    def update(self, character):
-        grade = membership_function(character, self.pattern[self.state])
-        self.state = next_state(self.state, character, self.pattern)
-        self.grades = update_grades(self.grades, grade)
-        print(f"Character: {character}, Grade: {grade}, State: {self.state}, Grades: {self.grades}")
+        ## Monitor Q State
+        self.state = 'q0'
+        self.position = 0
 
-# This function returns a new list where each element is the maximum of the corresponding element in grades and grade.
-def update_grades(grades, grade):
-    return [max(grade, g) for g in grades]
+        ## Monitor NFA Grade
+        self.grade = 0
 
-def fuzzy_string_match(T, P, threshold):
-    # Get the length of the text
-    n = len(T)
-    # Create an automaton for the pattern
-    automaton = Automaton(P)
-    # Initialize a variable to store the maximum membership grade
-    max_grade = 0
-    # Iterate over the text
-    for i in range(n):
-        # Update the automaton with the current character in the text
-        automaton.update(T[i])
-    # Compute the overall grade as the average of all the grades in the list
-    overall_grade = sum(automaton.grades) / len(automaton.grades)
-    # Test if the overall grade is above the threshold
-    if overall_grade >= threshold:
+        ## Define Final State
+        self.final_state = pattern[(round(len(pattern)*threshold))-1]
+        self.final_position = round(len(pattern)*threshold)
+
+    ## Next State Class Function
+    def next_state(self, character):
+        if not self.state == 'Trap State':
+            try:
+                if character == self.pattern[self.position]:
+                    self.state = self.pattern[self.position]
+                    self.position += 1
+                else:
+                    self.state = 'Trap State'
+            except IndexError:
+                self.state = 'Trap State'
+
+    ## Membership Grade Class Function
+    def membership_grade(self):
+        if self.isFinalState():
+            self.grade = 1
+        else:
+            self.grade = self.position/self.m
+
+    ## Final State Class Function
+    def isFinalState(self):
+        if self.state == self.final_state and self.position == self.final_position:
+            return True
+        else:
+            return False
+
+def fuzzyFSM(pattern, string, threshold):
+    ## Initialize Automaton
+    automaton = Automaton(pattern.lower(), threshold)
+
+    ## Debug Print Line
+    print('Now Comparing Word: [{}] and Pattern: [{}]'.format(string, pattern))
+    for i in string.lower():
+        ## Debug Print Line
+        print('Automaton State: ' + automaton.state)
+        print('Character Being Read :' + i)
+
+        ## Automaton Next State
+        automaton.next_state(i)
+        print('Transitioned to Next State Successful')
+
+        ## Debug Print Line
+        print('Automaton New State: ' + automaton.state)
+
+    ## Calculate Membership Grade of Automaton 
+    automaton.membership_grade()
+    print('Automaton Membership Grade Successfully Calculated')
+
+    ## Debug Print Line
+    print('Results:')
+    print('Final State: ' + str(automaton.isFinalState()))
+    print('Grade: ' + str(automaton.grade))
+    
+    if automaton.grade >= threshold:
         return True
     else:
         return False
-
-def membership_function(a, b):
-    """Calculate the membership grade for two strings.
-    
-    Args:
-    a: string, the first string
-    b: string, the second string
-    
-    Returns:
-    float, the membership grade for the two strings
-    """
-    # Initialize a counter variable
-    count = 0
-    # Iterate over the characters in the strings
-    for c1, c2 in zip(a, b):
-        # Increment the counter if the characters are equal
-        if c1 == c2:
-            count += 1
-    # Calculate the membership grade as the ratio of the number of matching characters to the length of the strings
-    grade = count / len(a)
-    # Return the membership grade
-    return grade
-
-def next_state(q, a, P):
-    # m is the length of the pattern.
-    m = len(P)
-    # k is the counter variable used to keep track of how many characters in the pattern match the current character.
-    k = 0
-    # This while loop increments k for as long as the character at index k in the pattern is equal to the current character and k is less than the length of the pattern.
-    while k < m and P[k] == a:
-        k += 1
-    # Return the minimum of k and q+1 if k is less than m, else return q
-    return min(k, q+1) if k < m else q
-
+        
 def get_text_from_docx(filename):
-    return docx2txt.process(filename)
+    text = docx2txt.process(filename)
+    text = re.sub(r'[^\w\s]', '', text)
+    return text
 
 def compare_documents(filename1, filename2, threshold):
-    # Split the text of the first document into a list of words
-    text1 = get_text_from_docx(filename1).split()
-    # Split the text of the second document into a list of words
-    text2 = get_text_from_docx(filename2).split()
-    # Get the minimum number of words between the two documents
-    n = min(len(text1), len(text2))
-    # Initialize a counter for the number of matches found
+    pattern_text = get_text_from_docx(filename1).split()
+    string_text = get_text_from_docx(filename2).split()
+
+    ## Min Words between Two DOCX
+    n = min(len(pattern_text), len(string_text))
+
+    ## Matches Counter
     matches = 0
-    # Iterate over each word in the documents
+    
+    ## Iteration
     for i in range(n):
-        # Get the shifts of the match between the two words
-        shifts = fuzzy_string_match(text1[i], text2[i], threshold)
-        
-        # If there are any shifts, it means that a match was found
-        if shifts:
-            print("Shifts: " + str(shifts))
+        match_result = fuzzyFSM(pattern_text[i], string_text[i], threshold)
+
+        if match_result:
+            print('Match Found\n\n')
             matches += 1
-    # Return the ratio of matches to total number of words as the percentage of similarity
+        else:
+            print('Match Not Found\n\n')
     print("Matches: " + str(matches))
     print("Total # of String: " + str(n))
     return matches / n
 
-filename1 = "test 4/document1.docx"
-filename2 = "test 4/document2.docx"
-threshold = 0.5
+if __name__ == "__main__":
+    filename1 = "test 1/document1.docx"
+    filename2 = "test 1/document2.docx"
+    threshold = 0.9
 
-similarity = compare_documents(filename1, filename2, threshold)
-print(f"Similarity: {similarity*100:.2f}%")
+    similarity = compare_documents(filename1, filename2, threshold)
+    print(f"Similarity: {similarity*100:.2f}%")
