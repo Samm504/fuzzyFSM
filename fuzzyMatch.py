@@ -40,7 +40,7 @@ class Automaton:
 
     ## Final State Class Function
     def isFinalState(self):
-        if self.state == self.final_state and self.position == self.final_position:
+        if self.position == self.final_position:
             return True
         else:
             return False
@@ -110,7 +110,7 @@ def compare_documents(filename1, filename2, threshold):
 if __name__ == "__main__":
     filename1 = "test 1/document1.docx"
     filename2 = "test 1/document2.docx"
-    threshold = 0.9
+    threshold = 1
 
     similarity = compare_documents(filename1, filename2, threshold)
     print(f"Similarity: {similarity*100:.2f}%")
