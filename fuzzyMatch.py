@@ -85,8 +85,10 @@ def get_text_from_docx(filename):
     return text
 
 def compare_documents(filename1, filename2, threshold):
-    pattern_text = get_text_from_docx(filename1).split()
-    string_text = get_text_from_docx(filename2).split()
+    #pattern_text = get_text_from_docx(filename1).split()
+    #string_text = get_text_from_docx(filename2).split()
+    pattern_text = filename1.split()
+    string_text = filename2.split()
 
     ## Min Words between Two DOCX
     n = min(len(pattern_text), len(string_text))
@@ -105,7 +107,7 @@ def compare_documents(filename1, filename2, threshold):
             print('Match Not Found\n\n')
     print("Matches: " + str(matches))
     print("Total # of String: " + str(n))
-    return matches / n
+    return matches
 
 if __name__ == "__main__":
     filename1 = "test 1/document1.docx"
