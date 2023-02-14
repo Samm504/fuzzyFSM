@@ -11,7 +11,7 @@ root.resizable(0,0)
 root.title("Plagiarism Checker")
 root.geometry("1250x625")
 
-threshold = 0.5
+#threshold = 0.5
 
 def browse_file1():
     global contents1
@@ -32,6 +32,8 @@ def browse_file2():
     txtf2.insert("1.0", contents2)
 
 def check_plagiarism():
+    threshold = slider.get()
+    
     file1 = lblfn1["text"]
     file2 = lblfn2["text"]
 
@@ -39,6 +41,7 @@ def check_plagiarism():
         messagebox.showerror("Error", "Please select two files first")
         return
 
+    print(threshold)
     #Total # of String
     n = min(len(contents1), len(contents2))
 
@@ -55,8 +58,8 @@ lbltitle.pack(pady=5, fill="x")
 lbltitle.config(anchor="center")
 
 #Frame for file insert 1
-frmMid = tk.Frame(root, width=200, height=400, bg='white', highlightthickness=2, highlightbackground="black")
-frmMid.pack(fill="both", expand = True, padx=10, pady=40)
+frmMid = tk.Frame(root, width=350, height=500, bg='white', highlightthickness=2, highlightbackground="black")
+frmMid.pack(fill="both", expand = True, padx=10, pady=20)
 
 #Label for Inserting file 1
 lblf1 = tk.Label(frmMid, text="Insert File 1", font=("Arial", 12), pady=10, bg="white")
@@ -90,9 +93,14 @@ txtf2.grid (row=2, column=6, sticky="w")
 btnf2 = tk.Button(frmMid, text="Insert File 2", font=("Arial", 10), pady=3, bg="white", command=browse_file2)
 btnf2.grid(row=4, column=6, sticky="w")
 
+#Treshold
+slider = tk.Scale(frmMid, from_=0, to=1, font=("Arial", 11), bg="white", orient=tk.HORIZONTAL, length=150, resolution=0.01)
+slider.set(0.5)
+slider.grid(row=5, column=3, sticky="w")
+
 #Button for Plagirism Checking
-btnf2 = tk.Button(frmMid, text="Check Plagiarism", font=("Arial", 10), pady=3, bg="white", command=check_plagiarism)
-btnf2.grid(row=5, column=3, sticky="w")
+btnc = tk.Button(frmMid, text="Check Plagiarism", font=("Arial", 10), padx=20, pady=3, bg="white", command=check_plagiarism)
+btnc.grid(row=7, column=3, sticky="w")
 
 #Blank Spaces
 lblb = tk.Label(frmMid, text="       ", bg="white").grid(row=1, column=0, sticky="w")
@@ -100,6 +108,7 @@ lblb1 = tk.Label(frmMid, text="      ", bg="white").grid(row=0, column=3, sticky
 lblb2 = tk.Label(frmMid, text="      ", bg="white").grid(row=0, column=4, sticky="w")
 lblb3 = tk.Label(frmMid, text="      ", bg="white").grid(row=2, column=3, sticky="w")
 lblb4 = tk.Label(frmMid, text="      ", bg="white").grid(row=2, column=4, sticky="w")
-lblb5 = tk.Label(frmMid, text="              ", bg="white").grid(row=3, column=4, sticky="w")
+lblb5 = tk.Label(frmMid, text="      ", bg="white").grid(row=3, column=4, sticky="w")
+lblb5 = tk.Label(frmMid, text="      ", bg="white").grid(row=6, column=0, sticky="w")
 
 root.mainloop()
