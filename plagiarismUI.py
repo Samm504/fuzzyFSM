@@ -4,27 +4,32 @@ from tkinter import filedialog, Text
 from tkinter import messagebox
 from tkinter import *
 import docx
+import fuzzyMatch as fsm
 
 root = tk.Tk()
 root.resizable(0,0)
 root.title("Plagiarism Checker")
 root.geometry("1250x625")
 
+threshold = 0.5
+
 def browse_file1():
+    global contents1
     file_path = filedialog.askopenfilename()
     lblfn1.config(text=file_path)
     document = docx.Document(file_path)
-    contents = "\n".join([paragraph.text for paragraph in document.paragraphs])
+    contents1 = "\n".join([paragraph.text for paragraph in document.paragraphs])
     txtf1.delete("1.0", "end")
-    txtf1.insert("1.0", contents)
+    txtf1.insert("1.0", contents1)
 
 def browse_file2():
+    global contents2
     file_path = filedialog.askopenfilename()
     lblfn2.config(text=file_path)
     document = docx.Document(file_path)
-    contents = "\n".join([paragraph.text for paragraph in document.paragraphs])
+    contents2 = "\n".join([paragraph.text for paragraph in document.paragraphs])
     txtf2.delete("1.0", "end")
-    txtf2.insert("1.0", contents)
+    txtf2.insert("1.0", contents2)
 
 def check_plagiarism():
     file1 = lblfn1["text"]
@@ -34,10 +39,14 @@ def check_plagiarism():
         messagebox.showerror("Error", "Please select two files first")
         return
 
-    # Add your plagiarism checking code here
+    #Total # of String
+    n = min(len(contents1), len(contents2))
 
-    messagebox.showinfo("Plagiarism Checker Result", "Match: *Insert match here* \nTotal Number of Strings:" 
-                        "*Insert total here* \n Similarity Results: *Insert Percentage here*")
+    # Add your plagiarism checking code here
+    similarity = fsm.compare_documents(contents1, contents2, threshold)
+
+    messagebox.showinfo("Plagiarism Checker Result", "Match: {} \nTotal Number of Strings:" 
+                        " {}\n Similarity Results: {}%".format(similarity, n, (similarity/n)*100))
 
 
 #Label for Title
