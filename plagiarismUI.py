@@ -41,15 +41,14 @@ def check_plagiarism():
         messagebox.showerror("Error", "Please select two files first")
         return
 
-    print(threshold)
+    #messagebox.showinfo("Threshold", threshold)
     #Total # of String
-    n = min(len(contents1), len(contents2))
+    n = min(len(contents1.split()), len(contents2.split()))
 
     # Add your plagiarism checking code here
     similarity = fsm.compare_documents(contents1, contents2, threshold)
 
-    messagebox.showinfo("Plagiarism Checker Result", "Match: {} \nTotal Number of Strings:" 
-                        " {}\n Similarity Results: {}%".format(similarity, n, (similarity/n)*100))
+    messagebox.showinfo("Plagiarism Checker Result", "Match: {} \nTotal Number of Strings: {}\n Similarity Results: {:.2f}%".format(similarity, n, float(similarity/n)*100))
 
 
 #Label for Title
